@@ -14,6 +14,10 @@ I plan on supporting:
 - PrintFailed
 - Error
 
+Pushbullet Channel Setup
+========================
+I created a channel so that my friends could subscribe to the channel and see these pushes as well. Use this page https://www.pushbullet.com/my-channels to create your channel and note the channel tag, because it will be needed in the Config file.
+
 Config File
 ============
 A config file needs to be created inside your ~/OctoPrint-Pushbullet directory named config.yaml
@@ -31,14 +35,14 @@ events:
   enabled: True
   subscriptions:
   - event: PrintDone
-    command: python ~/OctoPrint-Pushbullet/OctoPrint-Pushbullet.py -e PrintDone
+    command: python ~/OctoPrint-Pushbullet/OctoPrint-Pushbullet.py --eventname PrintDone --filename {file} --origin {origin} --time {time}
     type: system
   - event: PrintFailed
-    command: python ~/OctoPrint-Pushbullet/OctoPrint-Pushbullet.py -e PrintFailed
+    command: python ~/OctoPrint-Pushbullet/OctoPrint-Pushbullet.py --eventname PrintFailed --filename {file} --origin {origin}
     type: system
   - event: Error
-    command: python ~/OctoPrint-Pushbullet/OctoPrint-Pushbullet.py -e Error
+    command: python ~/OctoPrint-Pushbullet/OctoPrint-Pushbullet.py --eventname Error --error {error}
     type: system
   - event: CaptureDone
-    command: python ~/OctoPrint-Pushbullet/OctoPrint-Pushbullet.py -e CaptureDone
+    command: python ~/OctoPrint-Pushbullet/OctoPrint-Pushbullet.py --eventname CaptureDone --filename {file}
 ```
