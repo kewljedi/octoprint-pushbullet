@@ -40,8 +40,8 @@ url = 'https://api.pushbullet.com/v2/';
 #| | | |_| | | | | (__| |_| | (_) | | | \__ \
 #\_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
 
-def pushNote(title, body):
-  result = false;
+def pushNote(title, body, authtoken, channeltag):
+  result = False;
   pushdata = {
     'type':'note',
     'channel_tag':channeltag,
@@ -49,21 +49,26 @@ def pushNote(title, body):
     'body':body
   }
 
+  jsonheaders = {'Content-Type':'application/json','Authorization':'Bearer ' + authtoken};
+
   pushresponse = requests.post(url + 'pushes', data=json.dumps(pushdata), headers=jsonheaders);
   if pushresponse.status_code == 200:
-    result = true;
+    result = True;
 
   return result;
 
-def CaptureDone(outputFile):
+def CaptureDone(filename, authtoken, channeltag):
   #this event uploads the finish image to the pushbullet channel!
-  result = false;
+  result = False;
 
   # first thing first we need to find the file that is the last image taken.
   # lucky for us there are several examples that say it is:
   # /tmp/printDone.jpg this will be a parameter on the command line.
   filepath = '/tmp/printDone.jpg';
   filemime = 'image/jpeg';
+
+  jsonheaders = {'Content-Type':'application/json','Authorization':'Bearer ' + authtoken};
+
 
   # now we need to tell pushbullet that we are going to upload a file
   filedata = {
@@ -97,21 +102,21 @@ def CaptureDone(outputFile):
 
       pushresponse = requests.post(url + 'pushes', data=json.dumps(pushdata), headers=jsonheaders);
       if pushresponse.status_code == 200:
-        result = true;
+        result = True;
 
   return result;
 
-def PrintDone(file, origin, time):
+def PrintDone(filename, origin, time, authtoken, channeltag):
   #this sends a note to the channel when a print has finished
-  result = pushNote('Finished ' + file, 'Your print of ' + file + ' Finished after ' + time);
+  result = pushNote('Finished ' + filename, 'Your print of ' + filename + ' Finished after ' + time, authtoken,channeltag);
   return result;
 
-def PrintFailed(file, origin):
-  result = pushNote('Failed ' + file, 'Your print of ' + file + ' failed');
+def PrintFailed(filename, origin, authtoken, channeltag):
+  result = pushNote('Failed ' + filename, 'Your print of ' + filename + ' failed', authtoken, channeltag);
   return result;
 
-def Error(error):
-  result = pushNote('Printer Error', error);
+def Error(error, authtoken, channeltag):
+  result = pushNote('Printer Error', error, authtoken, channeltag);
   return result;
 
 #___  ___      _       _ _
@@ -121,12 +126,10 @@ def Error(error):
 #| |  | | (_| | | | | | | | | | |  __/
 #\_|  |_/\__,_|_|_| |_|_|_|_| |_|\___|
 
-jsonheaders = {'Content-Type':'application/json','Authorization':'Bearer ' + authtoken};
-
 def main(argv):
   event = '';
   try:
-    opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
+    opts, args = getopt.getopt(argv,"he:f:o:t:e:",["eventname=","filename=","origin=","time=","error="])
   except getopt.GetoptError:
     print 'OctoPrint-Pushbullet.py -e <eventname>'
     sys.exit(2)
@@ -135,13 +138,30 @@ def main(argv):
       print 'OctoPrint-Pushbullet.py -e <eventname>'
       sys.exit()
     elif opt in ("-e","--eventname"):
-      event = arg
+      eventname = arg
+    elif opt in ("-f","--filename"):
+      filename = arg
+    elif opt in ("-o","--origin"):
+      origin = arg
+    elif opt in ("t","--time"):
+      time = arg
+    elif opt in ("e","--error"):
+      error = arg
 
-  with open('~/OctoPrint-Pushbullet/config.yaml', 'r') as f:
+  with open('config.yaml', 'r') as f:
     config = yaml.load(f)
 
   authtoken = config['authtoken'];
   channeltag = config['channeltag'];
+
+  if eventname == 'PrintDone':
+    PrintDone(filename,origin, time, authtoken, channeltag)
+  elif eventname == 'PrintFailed':
+    PrintFailed(filename,origin, authtoken, channeltag)
+  elif eventname == 'Error':
+    Error(error, authtoken, channeltag)
+  elif eventname == 'CaptureDone':
+    CaptureDone(filename, authtoken, channeltag)
 
 if __name__ == "__main__":
   main(sys.argv[1:])
