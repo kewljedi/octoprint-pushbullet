@@ -52,3 +52,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+#don't upload my config file
+config.yaml
