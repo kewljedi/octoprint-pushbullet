@@ -119,6 +119,21 @@ def Error(error, authtoken, channeltag):
   result = pushNote('Printer Error', error, authtoken, channeltag);
   return result;
 
+def Help():
+  print 'OctoPrint-Pushbullet.py -e <eventname> {options needed for event}'
+  print '--eventname, -e'
+  print '  PrintDone'
+  print '    --filename, -f'
+  print '    --origin, -o'
+  print '    --time, -t'
+  print '  PrintFailed'
+  print '    --filename, -f'
+  print '    --origin, -o'
+  print '  Error'
+  print '    --error, -x'
+  print '  CaptureDone'
+  print '    --filename, -f this is the image file this time.'
+
 #___  ___      _       _ _
 #|  \/  |     (_)     | (_)
 #| .  . | __ _ _ _ __ | |_ _ __   ___
@@ -131,11 +146,11 @@ def main(argv):
   try:
     opts, args = getopt.getopt(argv,"he:f:o:t:e:",["eventname=","filename=","origin=","time=","error="])
   except getopt.GetoptError:
-    print 'OctoPrint-Pushbullet.py -e <eventname>'
+    Help()
     sys.exit(2)
   for opt, arg in opts:
     if opt == '-h':
-      print 'OctoPrint-Pushbullet.py -e <eventname>'
+      Help()
       sys.exit()
     elif opt in ("-e","--eventname"):
       eventname = arg
@@ -143,9 +158,9 @@ def main(argv):
       filename = arg
     elif opt in ("-o","--origin"):
       origin = arg
-    elif opt in ("t","--time"):
+    elif opt in ("-t","--time"):
       time = arg
-    elif opt in ("e","--error"):
+    elif opt in ("-x","--error"):
       error = arg
 
   with open('config.yaml', 'r') as f:
