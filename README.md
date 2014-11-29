@@ -18,6 +18,11 @@ Pushbullet Channel Setup
 ========================
 I created a channel so that my friends could subscribe to the channel and see these pushes as well. Use this page https://www.pushbullet.com/my-channels to create your channel and note the channel tag, because it will be needed in the Config file.
 
+Pip installs
+============
+sudo pip install pyyaml
+sudo pip install requests
+
 Config File
 ============
 A config file needs to be created inside your ~/OctoPrint-Pushbullet directory named config.yaml
