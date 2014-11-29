@@ -20,10 +20,10 @@ I created a channel so that my friends could subscribe to the channel and see th
 
 Pip installs
 ============
-'''
+```
 sudo pip install pyyaml
 sudo pip install requests
-'''
+```
 
 Config File
 ============
