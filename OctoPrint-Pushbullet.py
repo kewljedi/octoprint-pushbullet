@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, getopt, json, requests, yaml
+import sys, getopt, json, requests, yaml, ntpath
 
 #______      __
 #| ___ \    / _|
@@ -64,7 +64,8 @@ def CaptureDone(filename, authtoken, channeltag):
   # first thing first we need to find the file that is the last image taken.
   # lucky for us there are several examples that say it is:
   # /tmp/printDone.jpg this will be a parameter on the command line.
-  filepath = '/tmp/printDone.jpg';
+  filepath = filename;
+  filename = ntpath.basename(filename);
   filemime = 'image/jpeg';
 
   jsonheaders = {'Content-Type':'application/json','Authorization':'Bearer ' + authtoken};
@@ -72,7 +73,7 @@ def CaptureDone(filename, authtoken, channeltag):
 
   # now we need to tell pushbullet that we are going to upload a file
   filedata = {
-    'file_name':'printDone.jpg',
+    'file_name':filename,
     'file_type':filemime
   }
   fileresponse = requests.post(url + 'upload-request', data=json.dumps(filedata), headers=jsonheaders);
@@ -93,7 +94,7 @@ def CaptureDone(filename, authtoken, channeltag):
       #finally I just need to do a simple push of all of this as a file type, and it should appear.
       pushdata = {
         'type' : 'file',
-        'file_name': 'printDone.jpg',
+        'file_name': filename,
         'file_type': filemime,
         'file_url': fileurl,
         'body': 'Your print has finished!!!',
