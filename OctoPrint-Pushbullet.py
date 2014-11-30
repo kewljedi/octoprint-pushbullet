@@ -164,7 +164,7 @@ def main(argv):
     elif opt in ("-x","--error"):
       error = arg
 
-  with open('config.yaml', 'r') as f:
+  with open('/home/pi/octopi-pushbullet/config.yaml', 'r') as f:
     config = yaml.load(f)
 
   authtoken = config['authtoken'];
