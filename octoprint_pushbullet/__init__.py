@@ -155,7 +155,7 @@ class PushbulletPlugin(octoprint.plugin.EventHandlerPlugin,
 
     elif event == octoprint.events.Events.DISCONNECTED:
       title = "Printer Disconnected"
-      description "The printer has disconnected."
+      description = "The printer has disconnected."
 
     elif event == octoprint.events.Events.ERROR:
       title = "The Printer had an Error"
