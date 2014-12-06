@@ -63,9 +63,9 @@ class PushbulletPlugin(octoprint.plugin.EventHandlerPlugin,
 
   def get_assets(self):
     return {
-      "js": ["js/growl.js"],
-      "css": ["css/growl.css"],
-      "less": ["less/growl.less"]
+      "js": ["js/pushbullet.js"],
+      "css": ["css/pushbullet.css"],
+      "less": ["less/pushbullet.less"]
     }
 
   #~~ SimpleApiPlugin API
@@ -130,11 +130,85 @@ class PushbulletPlugin(octoprint.plugin.EventHandlerPlugin,
 
     title = description = None
 
-    if event == octoprint.events.Events.UPLOAD:
+    #Server Events
+
+    if event == octoprint.events.Events.STARTUP:
+      title = "The Octoprint is Alive Dave!"
+      description = "Octoprint has started up, and is now ready."
+
+    elif event == octoprint.events.Events.CLIENT_OPENED:
+      client_ip = payload["remoteAddress"]
+      title = "Someone is using octoprint"
+      description = "Someone is using octoprint from {ip}".format(ip=client_ip)
+
+    elif event == octoprint.events.Events.CLIENT_CLOSED:
+      title = "Someone left my octoprint"
+      description = "A connection to octoprint is no longer with us"
+
+    #Printer Events
+
+    elif event == octoprint.events.Events.CONNECTED:
+      port = payload["port"]
+      baudrate = payload["baudrate"]
+      title = "Printer Connected"
+      description = "The printer connected at {baudrate} on {port}".format(baudrate=baudrate, port=port)
+
+    elif event == octoprint.events.Events.DISCONNECTED:
+      title = "Printer Disconnected"
+      description "The printer has disconnected."
+
+    elif event == octoprint.events.Events.ERROR:
+      title = "The Printer had an Error"
+      description = payload["error"]
+
+    #File Handling Events
+
+    elif event == octoprint.events.Events.UPLOAD:
       file = payload["file"]
       target = payload["target"]
       title = "A new file was uploaded"
       description = "{file} was uploaded {targetString}".format(file=file, targetString="to SD" if target == "sd" else "locally")
+
+    elif event == octoprint.events.Events.UPDATED_FILES:
+      type = payload["type"]
+      title = "The files available to print changed"
+      description = "The list of files changed {type}".format(type=type)
+
+    elif event == octoprint.events.Events.METADATA_ANALYSIS_STARTED:
+      file = os.path.basename(payload["file"])
+      title = "Metadata Analysis Started"
+      description = "Metadata for {file} has started analysis"
+
+    elif event == octoprint.events.Events.METADATA_ANALYSIS_FINISHED:
+      file = os.path.basename(payload["file"])
+      results = payload["result"]
+      title = "Metadata Analysis Finished"
+      description = "Metadata analysis for {file} has finished"
+
+    elif event == octoprint.events.Events.FILE_SELECTED:
+      file = os.path.basename(payload["file"])
+      origin = payload["origin"]
+      title = "A file was selected"
+      description = "{file} was selected {origin}".format(file=file, origin="from SD" if origin == "sd" else "locally")
+
+    elif event == octoprint.events.Events.FILE_DESELECTED:
+      title = "No file is selected"
+      description = "No file is selected to print :("
+
+    elif event == octoprint.events.Events.TRANSFER_STARTED:
+      local = payload["local"]
+      remote = payload["remote"]
+      title = "Transfer Started"
+      description = "{remote} is transfering to {local}".format(remote=remote,local=local)
+
+    elif event = octoprint.events.Events.TRANSFER_DONE:
+      time = payload["time"]
+      local = payload["local"]
+      remote = payload["remote"]
+      title = "Transfer Completed"
+      description = "{remote} transfered to {local} in {time}".format(remote=remote,local=local,time=time)
+
+    #Printing Events
 
     elif event == octoprint.events.Events.PRINT_STARTED:
       file = os.path.basename(payload["file"])
@@ -142,11 +216,39 @@ class PushbulletPlugin(octoprint.plugin.EventHandlerPlugin,
       title = "A new print job was started"
       description = "{file} has started printing {originString}".format(file=file, originString="from SD" if origin == "sd" else "locally")
 
+    elif event == octoprint.events.Events.PRINT_FAILED:
+      file = os.path.basename(payload["file"])
+      origin = payload["origin"]
+      title = "The print FAILED"
+      description = "The print of {file} loaded from {origin} has failed.".format(file=file, origin ="from SD" if origin == "sd" else "locally")
+
     elif event == octoprint.events.Events.PRINT_DONE:
       file = os.path.basename(payload["file"])
       elapsed_time = payload["time"]
       title = "Print job finished"
       description = "{file} finished printing, took {elapsed_time} seconds".format(file=file, elapsed_time=elapsed_time)
+
+    elif event == octoprint.events.Events.PRINT_CANCELLED:
+      file = os.path.basename(payload["file"])
+      origin = payload["origin"]
+      title = "The print was cancelled"
+      description = "The print of {file} loaded from {origin} was cancelled.".format(file=file, origin ="from SD" if origin == "sd" else "locally")
+
+    elif event == octoprint.events.Events.PRINT_PAUSED:
+      file = os.path.basename(payload["file"])
+      origin = payload["origin"]
+      title = "The print was paused"
+      description = "The print of {file} loaded from {origin} was paused.".format(file=file, origin ="from SD" if origin == "sd" else "locally")
+
+    elif event == octoprint.events.Events.PRINT_RESUMED:
+      file = os.path.basename(payload["file"])
+      origin = payload["origin"]
+      title = "The print was resumed"
+      description = "The print of {file} loaded from {origin} was resumed.".format(file=file, origin ="from SD" if origin == "sd" else "locally")
+
+    #GCODE processing Events
+    #Timelapses Events
+    #Slicing Events
 
     pushNote(title, body, authtoken, channeltag)
 
