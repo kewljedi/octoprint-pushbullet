@@ -201,7 +201,7 @@ class PushbulletPlugin(octoprint.plugin.EventHandlerPlugin,
       title = "Transfer Started"
       description = "{remote} is transfering to {local}".format(remote=remote,local=local)
 
-    elif event = octoprint.events.Events.TRANSFER_DONE:
+    elif event == octoprint.events.Events.TRANSFER_DONE:
       time = payload["time"]
       local = payload["local"]
       remote = payload["remote"]
