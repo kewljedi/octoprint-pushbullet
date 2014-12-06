@@ -14,6 +14,17 @@ import octoprint.events
 import json
 import requests
 
+__plugin_name__ = "Pushbullet"
+__plugin_version__ ="0.0.1"
+__plugin_description__ = "Get Pushbullet notifications to a custom channel from OctoPrint"
+__plugin_implementations__ = [PushbulletPlugin()]
+
+def __plugin_init__():
+  global _plugin
+  _plugin = PushbulletPlugin()
+
+
+
 default_settings = {
   "authtoken": "",
   "channeltag" : "",
@@ -270,7 +281,3 @@ class PushbulletPlugin(octoprint.plugin.EventHandlerPlugin,
       result = True;
 
     return result;
-
-__plugin_name__ = "Pushbullet"
-__plugin_description__ = "Get Pushbullet notifications to a custom channel from OctoPrint"
-__plugin_implementations__ = [PushbulletPlugin()]
