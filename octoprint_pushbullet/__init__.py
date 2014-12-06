@@ -206,6 +206,8 @@ class PushbulletPlugin(octoprint.plugin.EventHandlerPlugin,
       title = "No file is selected"
       description = "No file is selected to print :("
 
+    #SD Upload
+
     elif event == octoprint.events.Events.TRANSFER_STARTED:
       local = payload["local"]
       remote = payload["remote"]
@@ -258,8 +260,70 @@ class PushbulletPlugin(octoprint.plugin.EventHandlerPlugin,
       description = "The print of {file} loaded from {origin} was resumed.".format(file=file, origin ="from SD" if origin == "sd" else "locally")
 
     #GCODE processing Events
+
+    elif event == octoprint.events.Events.POWER_ON:
+      title = "GCODE Power On"
+      description = "M80"
+
+    elif event == octoprint.events.Events.POWER_OFF:
+      title = "GCODE Power Off"
+      description = "M81"
+
+    elif event == octoprint.events.Events.HOME:
+      title = "GCODE Home"
+      description = "G28"
+
+    elif event == octoprint.events.Events.Z_CHANGE:
+      title = "GCODE Z Change"
+      description = "Z Axis Changed"
+
+    elif event == octoprint.events.Events.WAITING:
+      title = "GCODE Waiting"
+      description = "Waiting command"
+
+    elif event == octoprint.events.Events.COOLING:
+      title = "GCODE Cooling"
+      description = "M245"
+
+    elif event == octoprint.events.Events.ALERT:
+      title = "GCODE Alert"
+      description = "M300"
+
+    elif event == octoprint.events.Events.CONVEYOR:
+      title = "GCODE Conveyor"
+      description = "M240"
+
+    elif event == octoprint.events.Events.EJECT:
+      title = "GCODE Eject"
+      description = "M40"
+
+    elif event == octoprint.events.Events.E_STOP:
+      title = "GCODE Emergency Stop"
+      description = "M112"
+
     #Timelapses Events
+
     #Slicing Events
+
+    elif event == octoprint.events.Events.SLICING_STARTED:
+      stl = s.path.basename(payload["stl"])
+      gcode = s.path.basename(payload["gcode"])
+      title = "Slicing of file started"
+      description = "Slicing of {stl} to {gcode} has started".format(stl=stl, gcode=gcode)
+
+    elif event == octoprint.events.Events.SLICING_DONE:
+      stl = s.path.basename(payload["stl"])
+      gcode = s.path.basename(payload["gcode"])
+      time = payload["time"]
+      title = "Slicing of file Done"
+      description = "Slicing of {stl} to {gcode} is done in {time}".format(stl=stl, gcode=gcode,time=time)
+
+    elif event == octoprint.events.Events.SLICING_FAILED:
+      stl = s.path.basename(payload["stl"])
+      gcode = s.path.basename(payload["gcode"])
+      reason = payload["reason"]
+      title = "Slicing of file Failed"
+      description = "Slicing of {stl} to {gcode} failed with {reason}".format(stl=stl, gcode=gcode,reason=reason)
 
     pushNote(title, body, authtoken, channeltag)
 
